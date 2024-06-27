@@ -15,7 +15,6 @@ const AuthForm = () => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    
 
     const enteredEmail = emailInputRef.current.value;
     const eneteredPassword = passwordInputRef.current.value;
@@ -23,37 +22,45 @@ const AuthForm = () => {
     // optional: Add Validation
 
     setIsLoading(true);
-
+    let url;
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAiOs1iUhJxoG_bOV3-8v55Femyrqc5YpI";
     } else {
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAiOs1iUhJxoG_bOV3-8v55Femyrqc5YpI",
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: eneteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAiOs1iUhJxoG_bOV3-8v55Femyrqc5YpI";
+    }
+    fetch(url, { 
+      method: "POST",
+      body: JSON.stringify({
+        email: enteredEmail,
+        password: eneteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
         setIsLoading(false);
         if (res.ok) {
           // ...
         } else {
           return res.json().then((data) => {
-            let errorMessage = 'Authentication Failed!';
+            let errorMessage = "Authentication Failed!";
             // if (data && data.error && data.error.message) {
             //   errorMessage = data.error.message;
             // }
-            alert(errorMessage);
+            throw new Error(errorMessage);
           });
         }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        alert(err.message);
       });
-    }
   };
 
   return (
@@ -74,7 +81,9 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
           {isLoading && <p>Sending Request......</p>}
           <button
             type="button"
